@@ -46,9 +46,13 @@ void ExportDataToFiles::exportAllDataToText(const DataProcessor* dp, const QStri
     QString pathTemp = dir.absoluteFilePath(baseFilename + "_Temp.txt");
     saveVectorTxt(dp->getAllTempData(), startTime, pathTemp);
 
-    // 6) SpO2
+    // 6) SpO2 (AC/DC)
     QString pathSpo2 = dir.absoluteFilePath(baseFilename + "_Spo2.txt");
     saveVectorTxt(dp->getAllSpo2Data(), startTime, pathSpo2);
+
+    // 7) SpO2 by peaks
+    QString pathSpo2P = dir.absoluteFilePath(baseFilename + "_Spo2Peaks.txt");
+    saveVectorTxt(dp->getAllSpo2PeakData(), startTime, pathSpo2P);
 
     // 7) Файл с данными по BPM за 1 минуту (среднее, минимум, максимум)
     QString pathBpm1min = dir.absoluteFilePath(baseFilename + "_BPM1min.txt");
@@ -111,9 +115,13 @@ void ExportDataToFiles::exportAllDataToBinary(const DataProcessor* dp, const QSt
     QString pathTemp = dir.absoluteFilePath(baseFilename + "_Temp.bin");
     saveVectorBin(dp->getAllTempData(), startTime, pathTemp);
 
-    // 6) SpO2
+    // 6) SpO2 (AC/DC)
     QString pathSpo2 = dir.absoluteFilePath(baseFilename + "_Spo2.bin");
     saveVectorBin(dp->getAllSpo2Data(), startTime, pathSpo2);
+
+    // 7) SpO2 by peaks
+    QString pathSpo2P = dir.absoluteFilePath(baseFilename + "_Spo2Peaks.bin");
+    saveVectorBin(dp->getAllSpo2PeakData(), startTime, pathSpo2P);
 
     qDebug() << "Binary export complete, baseFilename =" << baseFilename;
 }
