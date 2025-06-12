@@ -260,6 +260,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
+    delete dataProcessor;
     delete ui;
 }
 
