@@ -1,0 +1,8 @@
+# Игнорируем папку сборки
+build/
+build-*/
+cmake-build-*/
+
+ui_*.h
+*.exe
+*.pro.user
