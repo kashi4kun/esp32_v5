@@ -1,6 +1,6 @@
-#include "IpSettingsDialog.h"
+#include "ipsettingsdialog.h"
 #include <QSettings>
-#include "ui_IpSettingsDialog.h"
+#include "ui_ipsettingsdialog.h"
 
 IpSettingsDialog::IpSettingsDialog(QWidget *parent)
     : QDialog(parent)

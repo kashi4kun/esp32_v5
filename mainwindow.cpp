@@ -7,7 +7,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QDebug>
-#include "IpSettingsDialog.h"
+#include "ipsettingsdialog.h"
 #include "exportDataToFiles.h"
 
 MainWindow::MainWindow(QWidget *parent)
