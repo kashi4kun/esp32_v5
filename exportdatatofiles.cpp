@@ -1,4 +1,4 @@
-#include "ExportDataToFiles.h"
+#include "exportdatatofiles.h"
 #include "dataProcessor.h"
 
 #include <QFile>
