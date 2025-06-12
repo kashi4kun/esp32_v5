@@ -6,3 +6,5 @@ cmake-build-*/
 ui_*.h
 *.exe
 *.pro.user
+Result/
+Result_Binar/

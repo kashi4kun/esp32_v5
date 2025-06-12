@@ -96,6 +96,7 @@ DataProcessor::DataProcessor(QLineSeries* bpmSeries,
                              QLineSeries* irSeries,
                              QLineSeries* tempSeries,
                              QLineSeries* spo2Series,
+                             QLineSeries* spo2PeakSeries,
                              QValueAxis* irAxisX,
                              QValueAxis* bpmAxisX,
                              QValueAxis* avgBpmAxisX,
@@ -108,6 +109,7 @@ DataProcessor::DataProcessor(QLineSeries* bpmSeries,
     irSeries(irSeries),
     tempSeries(tempSeries),
     spo2Series(spo2Series),
+    spo2PeakSeries(spo2PeakSeries),
     irAxisX(irAxisX),
     bpmAxisX(bpmAxisX),
     avgBpmAxisX(avgBpmAxisX),
@@ -124,7 +126,8 @@ DataProcessor::DataProcessor(QLineSeries* bpmSeries,
     candidatePeak(0.0),
     candidateTime(0),
     dropThreshold(0.001), // Порог падения 0.1%
-    windowSize(5)  // Размер окна для детекции пика
+    windowSize(5),  // Размер окна для детекции пика
+    spo2WindowMs(4000)
 {
     qDebug() << "DataProcessor constructor completed";
 
@@ -144,6 +147,15 @@ double DataProcessor::calculateAverage(const QVector<double>& values) {
     double sum = 0;
     for (double v : values)
         sum += v;
+    return sum / values.size();
+}
+
+double DataProcessor::calculateAverage(const QDeque<std::pair<qint64, double>>& values) {
+    if (values.isEmpty())
+        return 0.0;
+    double sum = 0.0;
+    for (const auto &p : values)
+        sum += p.second;
     return sum / values.size();
 }
 
@@ -186,7 +198,14 @@ void DataProcessor::processValues(qint64 timestamp, double infraredValue, double
              << ", Temp=" << temperatureValue
              << ", currentTimeSec=" << currentTimeSec;
 
-    // Вычисляем DC-компоненты для буферов
+    // Обновляем буферы с учётом времени для метода AC/DC
+    irBuffer.push_back({timestamp, infraredValue});
+    redBuffer.push_back({timestamp, redValue});
+    while (!irBuffer.isEmpty() && timestamp - irBuffer.front().first > spo2WindowMs)
+        irBuffer.pop_front();
+    while (!redBuffer.isEmpty() && timestamp - redBuffer.front().first > spo2WindowMs)
+        redBuffer.pop_front();
+
     double infraredDC = calculateAverage(irBuffer);
     double redDC = calculateAverage(redBuffer);
     double infraredAC = infraredValue - infraredDC;
@@ -233,6 +252,10 @@ void DataProcessor::processValues(qint64 timestamp, double infraredValue, double
     peakWindowValues.push_back(infraredValue);
     peakWindowTimestamps.push_back(timestamp);
 
+    // Копим данные между пиками для метода 2
+    intervalIrValues.push_back(infraredValue);
+    intervalRedValues.push_back(redValue);
+
     // Если окно превышает размер, удаляем самую старую точку
     if (peakWindowValues.size() > windowSize) {
         peakWindowValues.pop_front();
@@ -276,15 +299,30 @@ void DataProcessor::processValues(qint64 timestamp, double infraredValue, double
                         minuteCalculator.addBpmValue(bpm);
                     }
                 }
+                if (lastPeakTime != 0 && !intervalIrValues.isEmpty() && !intervalRedValues.isEmpty()) {
+                    double irMax = *std::max_element(intervalIrValues.begin(), intervalIrValues.end());
+                    double irMin = *std::min_element(intervalIrValues.begin(), intervalIrValues.end());
+                    double redMax = *std::max_element(intervalRedValues.begin(), intervalRedValues.end());
+                    double redMin = *std::min_element(intervalRedValues.begin(), intervalRedValues.end());
+                    double irAC = irMax - irMin;
+                    double redAC = redMax - redMin;
+                    double irDC = (irMax + irMin) / 2.0;
+                    double redDC = (redMax + redMin) / 2.0;
+                    if (irAC > 0 && redAC > 0 && irDC > 0 && redDC > 0) {
+                        double R = (redAC / redDC) / (irAC / irDC);
+                        int spo2p = static_cast<int>(110 - 25.0 * R);
+                        spo2p = qBound(80, spo2p, 100);
+                        spo2PeakSeries->append(peakTimeSec, spo2p);
+                        allSpo2PeakData.append(QPointF(peakTimeSec, spo2p));
+                    }
+                }
+                intervalIrValues.clear();
+                intervalRedValues.clear();
+                intervalIrValues.push_back(infraredValue);
+                intervalRedValues.push_back(redValue);
                 lastPeakTime = detectedPeakTime;
             }
         }
     }
     // --- Конец алгоритма детекции пиков ---
-
-    // Обновляем буферы для SpO₂
-    irBuffer.push_back(infraredValue);
-    redBuffer.push_back(redValue);
-    if (irBuffer.size() > 100) irBuffer.pop_front();
-    if (redBuffer.size() > 100) redBuffer.pop_front();
 }

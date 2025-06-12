@@ -30,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Серия для SpO₂
     QLineSeries *bloodOxygenSaturationSeries = new QLineSeries();
+    bloodOxygenSaturationSeries->setName("SpO₂ AC/DC");
+    QLineSeries *bloodOxygenSaturationPeakSeries = new QLineSeries();
+    bloodOxygenSaturationPeakSeries->setName("SpO₂ Peaks");
 
     // Создаем оси для графиков (отображение в секундах)
     QValueAxis *axisIrX   = new QValueAxis();
@@ -47,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
         new QLineSeries(), // IR series
         new QLineSeries(), // Temperature series
         bloodOxygenSaturationSeries, // SpO₂ series
+        bloodOxygenSaturationPeakSeries, // SpO₂ by peaks
         axisIrX, axisBpmX, axisAvgX, axisTempX, axisRedX, axisSpo2X,
         averageMinuteBpmLabel
         );
@@ -208,8 +212,13 @@ MainWindow::MainWindow(QWidget *parent)
         spo2Chart->addAxis(spo2AxisY, Qt::AlignLeft);
 
         spo2Chart->addSeries(dataProcessor->getSpo2Series());
+        spo2Chart->addSeries(dataProcessor->getSpo2PeakSeries());
+        dataProcessor->getSpo2Series()->setColor(Qt::blue);
+        dataProcessor->getSpo2PeakSeries()->setColor(Qt::darkGreen);
         dataProcessor->getSpo2Series()->attachAxis(axisSpo2XPtr);
         dataProcessor->getSpo2Series()->attachAxis(spo2AxisY);
+        dataProcessor->getSpo2PeakSeries()->attachAxis(axisSpo2XPtr);
+        dataProcessor->getSpo2PeakSeries()->attachAxis(spo2AxisY);
 
         spo2ChartView->setChart(spo2Chart);
     }

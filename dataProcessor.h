@@ -4,6 +4,8 @@
 #include <QLineSeries>
 #include <QValueAxis>
 #include <QVector>
+#include <QDeque>
+#include <utility>
 #include <QLabel>
 #include <QDateTime>
 #include <QObject>
@@ -32,6 +34,7 @@ public:
 
 private:
     double calculateAverage(const QVector<double>& values);
+    double calculateAverage(const QDeque<std::pair<qint64, double>>& values);
     double calculateMedian(QVector<double> values);
     QVector<double> bpmValues;
     QVector<qint64> bpmTimeStamps;
@@ -48,6 +51,7 @@ public:
                   QLineSeries* irSeries,
                   QLineSeries* tempSeries,
                   QLineSeries* spo2Series,
+                  QLineSeries* spo2PeakSeries,
                   QValueAxis* irAxisX,
                   QValueAxis* bpmAxisX,
                   QValueAxis* avgBpmAxisX,
@@ -70,6 +74,7 @@ public:
     QLineSeries* getAvgBPMSeries() const { return avgBpmSeries; }
     QLineSeries* getTempSeries() const { return tempSeries; }
     QLineSeries* getSpo2Series() const { return spo2Series; }
+    QLineSeries* getSpo2PeakSeries() const { return spo2PeakSeries; }
     // Геттер для серии пиков (QScatterSeries)
     QScatterSeries* getPeakSeries() const { return peakSeries; }
 
@@ -79,6 +84,7 @@ public:
     const QVector<QPointF>& getAllBpmData() const { return allBpmData; }
     const QVector<QPointF>& getAllAvgBpmData() const { return allAvgBpmData; }
     const QVector<QPointF>& getAllSpo2Data() const { return allSpo2Data; }
+    const QVector<QPointF>& getAllSpo2PeakData() const { return allSpo2PeakData; }
 
     const MinuteAverageCalculator* getMinuteCalculator() const { return &minuteCalculator; }
 
@@ -98,6 +104,7 @@ private:
     QLineSeries* irSeries;
     QLineSeries* tempSeries;
     QLineSeries* spo2Series;
+    QLineSeries* spo2PeakSeries;
     QLineSeries* redSeries;  // Серия для Red
 
     QVector<QPointF> allIRData;
@@ -106,6 +113,7 @@ private:
     QVector<QPointF> allBpmData;
     QVector<QPointF> allAvgBpmData;
     QVector<QPointF> allSpo2Data;
+    QVector<QPointF> allSpo2PeakData;
 
     QValueAxis* irAxisX;
     QValueAxis* bpmAxisX;
@@ -120,8 +128,11 @@ private:
     qint64 lastPeakTime;
 
     MinuteAverageCalculator minuteCalculator;
-    QVector<double> redBuffer;
-    QVector<double> irBuffer;
+    QDeque<std::pair<qint64, double>> redBuffer;
+    QDeque<std::pair<qint64, double>> irBuffer;
+    QVector<double> intervalIrValues;
+    QVector<double> intervalRedValues;
+    const int spo2WindowMs;
 
     // Для детекции пиков по окну:
     QVector<double> peakWindowValues;
