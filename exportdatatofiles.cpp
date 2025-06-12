@@ -131,12 +131,12 @@ void ExportDataToFiles::saveVectorTxt(const QVector<QPointF> &data,
     }
     QTextStream out(&file);
 
-    // Для каждой точки (QPointF): x() – это elapsedTime, y() – значение
-    // Восстанавливаем абсолютное время = timeStart + x()
-    // Выводим в формате "hh:mm:ss <tab> value"
+    // Для каждой точки (QPointF): x() – это elapsedTime в секундах, y() – значение
+    // Восстанавливаем абсолютное время в миллисекундах и выводим в формате
+    // "hh:mm:ss <tab> value"
     for(const QPointF &p : data) {
-        qint64 absoluteSec = timeStart + static_cast<qint64>(p.x());
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(absoluteSec, Qt::LocalTime);
+        qint64 absoluteMs = timeStart + static_cast<qint64>(p.x() * 1000);
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(absoluteMs);
         QString timeStr = dt.toString("hh:mm:ss");
         out << timeStr << "\t" << p.y() << "\n";
     }
@@ -158,9 +158,8 @@ void ExportDataToFiles::saveVectorBin(const QVector<QPointF> &data,
     // Формат: (int hour, int min, int sec, int msec, double value)
     // Для каждой точки
     for(const QPointF &p : data) {
-        qint64 absoluteSec = timeStart + static_cast<qint64>(p.x());
-        qint64 msSinceEpoch = absoluteSec * 1000; // переводим в миллисекунды
-        QDateTime dt = QDateTime::fromMSecsSinceEpoch(msSinceEpoch);
+        qint64 absoluteMs = timeStart + static_cast<qint64>(p.x() * 1000);
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(absoluteMs);
 
         int hour   = dt.time().hour();
         int minute = dt.time().minute();
