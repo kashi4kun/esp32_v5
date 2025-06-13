@@ -159,11 +159,6 @@ double DataProcessor::calculateAverage(const QDeque<std::pair<qint64, double>>& 
     return sum / values.size();
 }
 
-double DataProcessor::detectSpO2(double irValue, double redValue) {
-    // Логика расчёта SpO₂ может быть реализована здесь
-    return 0.0;
-}
-
 // Сохраняем старую функцию, если понадобится (но новый алгоритм в processValues используется для пиков)
 bool DataProcessor::detectPeakImproved(double irValue, qint64 timestamp) {
     bool peakDetected = false;

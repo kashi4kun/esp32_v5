@@ -63,7 +63,6 @@ public:
     void processValues(qint64 timestamp, double irValue, double redValue, double tempValue);
     bool detectPeakImproved(double irValue, qint64 timestamp);
     double calculateAverage(const QVector<double>& values);
-    double detectSpO2(double irValue, double redValue);
 
     qint64 getStartTime() const { return timeStart; }
     double getElapsedTime() const { return (static_cast<double>(lastReceivedTimestamp - timeStart)) / 1000.0; }
