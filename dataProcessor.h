@@ -34,7 +34,6 @@ public:
 
 private:
     double calculateAverage(const QVector<double>& values);
-    double calculateAverage(const QQueue<std::pair<qint64, double>>& values);
     double calculateMedian(QVector<double> values);
     QVector<double> bpmValues;
     QVector<qint64> bpmTimeStamps;
