@@ -60,6 +60,8 @@ public:
                   QValueAxis* spo2AxisX,
                   QLabel* avgLabel);
 
+    ~DataProcessor();
+
     void processValues(qint64 timestamp, double irValue, double redValue, double tempValue);
     bool detectPeakImproved(double irValue, qint64 timestamp);
     double calculateAverage(const QVector<double>& values);
