@@ -4,7 +4,7 @@
 #include <QLineSeries>
 #include <QValueAxis>
 #include <QVector>
-#include <QDeque>
+#include <QQueue>
 #include <utility>
 #include <QLabel>
 #include <QDateTime>
@@ -34,7 +34,7 @@ public:
 
 private:
     double calculateAverage(const QVector<double>& values);
-    double calculateAverage(const QDeque<std::pair<qint64, double>>& values);
+    double calculateAverage(const QQueue<std::pair<qint64, double>>& values);
     double calculateMedian(QVector<double> values);
     QVector<double> bpmValues;
     QVector<qint64> bpmTimeStamps;
@@ -130,8 +130,8 @@ private:
     qint64 lastPeakTime;
 
     MinuteAverageCalculator minuteCalculator;
-    QDeque<std::pair<qint64, double>> redBuffer;
-    QDeque<std::pair<qint64, double>> irBuffer;
+    QQueue<std::pair<qint64, double>> redBuffer;
+    QQueue<std::pair<qint64, double>> irBuffer;
     QVector<double> intervalIrValues;
     QVector<double> intervalRedValues;
     const int spo2WindowMs;

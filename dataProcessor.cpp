@@ -173,7 +173,7 @@ double DataProcessor::calculateAverage(const QVector<double>& values) {
     return sum / values.size();
 }
 
-double DataProcessor::calculateAverage(const QDeque<std::pair<qint64, double>>& values) {
+double DataProcessor::calculateAverage(const QQueue<std::pair<qint64, double>>& values) {
     if (values.isEmpty())
         return 0.0;
     double sum = 0.0;
