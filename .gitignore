@@ -8,3 +8,9 @@ ui_*.h
 *.pro.user
 Result/
 Result_Binar/
+
+# Ignoring object and library files
+*.o
+*.obj
+*.dll
+*.so
