@@ -141,6 +141,29 @@ DataProcessor::DataProcessor(QLineSeries* bpmSeries,
     peakSeries->setMarkerSize(10.0);
 }
 
+DataProcessor::~DataProcessor() {
+    auto maybeDelete = [](QObject* obj) {
+        if (obj && obj->parent() == nullptr)
+            delete obj;
+    };
+
+    maybeDelete(peakSeries);
+    maybeDelete(redSeries);
+    maybeDelete(bpmSeries);
+    maybeDelete(avgBpmSeries);
+    maybeDelete(irSeries);
+    maybeDelete(tempSeries);
+    maybeDelete(spo2Series);
+    maybeDelete(spo2PeakSeries);
+
+    maybeDelete(irAxisX);
+    maybeDelete(bpmAxisX);
+    maybeDelete(avgBpmAxisX);
+    maybeDelete(tempAxisX);
+    maybeDelete(redAxisX);
+    maybeDelete(spo2AxisX);
+}
+
 double DataProcessor::calculateAverage(const QVector<double>& values) {
     if (values.isEmpty())
         return 0;
