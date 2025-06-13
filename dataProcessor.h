@@ -5,6 +5,7 @@
 #include <QValueAxis>
 #include <QVector>
 #include <QQueue>
+#include <QDeque>
 #include <utility>
 #include <QLabel>
 #include <QDateTime>
@@ -65,6 +66,7 @@ public:
     void processValues(qint64 timestamp, double irValue, double redValue, double tempValue);
     bool detectPeakImproved(double irValue, qint64 timestamp);
     double calculateAverage(const QVector<double>& values);
+    double calculateAverage(const QDeque<std::pair<qint64, double>>& values);
     double detectSpO2(double irValue, double redValue);
 
     qint64 getStartTime() const { return timeStart; }
